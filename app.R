@@ -8,6 +8,7 @@ ui <- fluidPage(
   titlePanel("Searchable DT"),
   sidebarLayout(
     sidebarPanel(
+      uiOutput("speciesSelectInput"),
       uiOutput("instSelectInput")
     ),
     mainPanel(
@@ -36,6 +37,26 @@ server <- function(input, output, session) {
       message = list(
         tablelocator = table_id,
         regex = paste0("(", paste0(input$instSelect, collapse = "|"), ")")
+      )
+    )
+  )
+
+  output$speciesSelectInput <- renderUI(
+    selectInput("speciesSelect",
+      "Filter By Species",
+      # unique(df$Species),
+      c("setosa", "versicolor", "virginica"),
+      multiple = TRUE
+    )
+  )
+
+  observeEvent(
+    input$speciesSelect,
+    session$sendCustomMessage(
+      type = "speciesFilter",
+      message = list(
+        tablelocator = table_id,
+        regex = paste0("(", paste0(input$speciesSelect, collapse = "|"), ")")
       )
     )
   )
